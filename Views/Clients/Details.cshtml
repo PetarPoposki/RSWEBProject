@@ -1,0 +1,67 @@
+﻿@model RSWEBProject.ViewModels.ClientPicture
+
+@{
+    ViewData["Title"] = "Details";
+}
+<h1>Details</h1>
+
+<div>
+    <h4>Client</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+           Profile picture:
+        </dt>
+        <dd class = "col-sm-10">
+            <img src="~/profilePictures/@Model.client.ProfilePicture"
+                class="rounded-circle"
+                height="40" width="40"
+                asp-append-version="true" />
+        </dd> 
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.client.FirstName)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.client.FirstName)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.client.LastName)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.client.LastName)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.client.PhoneNumber)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.client.PhoneNumber)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.client.Address)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.client.Address)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.client.Email)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.client.Email)
+        </dd>
+        
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.client.Id">Edit</a> |
+    @if (User.Identity.IsAuthenticated && User.IsInRole("Client"))
+
+    {
+        <a asp-action="EditPicture" asp-route-id="@Model?.client.Id">Edit picture</a>
+    }
+    |
+    <a asp-action="Index">Back to List</a> |
+    @if (User.Identity.IsAuthenticated && User.IsInRole("Client"))
+    {
+        <a asp-controller="Restaurants" asp-action="ViewOrders" asp-route-id="@Model?.client.Id">Check Orders</a>
+    }
+</div>

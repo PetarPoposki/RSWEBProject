@@ -1,0 +1,84 @@
+﻿@model RSWEBProject.ViewModels.DeliveryManQuery
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Delivery Men</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<form asp-controller="DeliveryMen" asp-action="Index" method="get">
+    <p>
+        Name: <input type="text" asp-for="FullName" />
+        
+        <input type="submit" value="Filter" />
+    </p>
+</form>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Profile Picture
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DeliveryMen[0].FirstName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DeliveryMen[0].LastName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DeliveryMen[0].HireDate)
+            </th>
+            
+            <th>
+                Check Restaurants
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.DeliveryMen) {
+        <tr>
+            <td>
+               
+            <img src="~/profilePictures/@item.ProfilePicture"
+                class="rounded-circle"
+                height="70" width="70"
+                asp-append-version="true" />
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FirstName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.LastName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.HireDate)
+            </td>
+            
+            <td>
+                <a asp-controller="Restaurants" asp-action="ViewRestaurants" asp-route-id="@item.Id">Check Restaurants</a>
+            </td>
+            <td>
+                    @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+                    {
+                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+                    }
+                    |
+                    @if (User.Identity.IsAuthenticated && User.IsInRole("Delivery Man"))
+                    {
+                        <a asp-action="Details" asp-route-id="@item.Id">Details</a>
+                    }
+                    |
+                    @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+                    {
+                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    }
+                </td>
+        </tr>
+}
+    </tbody>
+</table>

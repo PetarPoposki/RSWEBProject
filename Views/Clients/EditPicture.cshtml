@@ -1,0 +1,67 @@
+﻿@model RSWEBProject.ViewModels.ClientPicture
+
+@{
+    ViewData["Title"] = "EditPicture";
+}
+
+<h1>Edit</h1>
+
+<h4>Client</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="EditPicture" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="client.Id" />
+            <div class="form-group" style="display:none">
+                <label asp-for="client.FirstName" class="control-label"></label>
+                <input asp-for="client.FirstName" class="form-control" />
+                <span asp-validation-for="client.FirstName" class="text-danger"></span>
+            </div>
+            <div class="form-group" style="display:none">
+                <label asp-for="client.LastName" class="control-label"></label>
+                <input asp-for="client.LastName" class="form-control" />
+                <span asp-validation-for="client.LastName" class="text-danger"></span>
+            </div>
+            <div class="form-group" style="display:none">
+                <label asp-for="client.PhoneNumber" class="control-label"></label>
+                <input asp-for="client.PhoneNumber" class="form-control" />
+                <span asp-validation-for="client.PhoneNumber" class="text-danger"></span>
+            </div>
+            <div class="form-group" style="display:none">
+                <label asp-for="client.Address" class="control-label"></label>
+                <input asp-for="client.Address" class="form-control" />
+                <span asp-validation-for="client.Address" class="text-danger"></span>
+            </div>
+            <div class="form-group" style="display:none">
+                <label asp-for="client.Email" class="control-label"></label>
+                <input asp-for="client.Email" class="form-control" />
+                <span asp-validation-for="client.Email" class="text-danger"></span>
+            </div>
+           <div class="form-group" style="display:none">
+                <label asp-for="client.ProfilePicture" class="control-label"></label>
+                <input asp-for="ProfilePictureName" class="form-control" readonly="@(true)">
+                <span asp-validation-for="client.ProfilePicture" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ProfilePictureFile" class="control-label"></label>
+                <div class="custom-file">
+                    <input asp-for="ProfilePictureFile" class="custom-file-input" id="customFile">
+                    <label class="custom-file-label" for="customFile"></label>
+                </div>
+                <span asp-validation-for="ProfilePictureFile" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Details">Back to Details</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
