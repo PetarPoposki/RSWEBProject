@@ -59,7 +59,11 @@
         <a asp-action="EditPicture" asp-route-id="@Model?.client.Id">Edit picture</a>
     }
     |
-    <a asp-action="Index">Back to List</a> |
+    @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+    {
+        <a asp-action="Index">Back to List</a>
+    }
+    |
     @if (User.Identity.IsAuthenticated && User.IsInRole("Client"))
     {
         <a asp-controller="Restaurants" asp-action="ViewOrders" asp-route-id="@Model?.client.Id">Check Orders</a>

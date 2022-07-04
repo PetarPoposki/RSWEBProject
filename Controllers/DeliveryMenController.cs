@@ -57,7 +57,11 @@ namespace RSWEBProject.Controllers
             {
                 return NotFound();
             }
-            
+            var userLoggedInId = HttpContext.Session.GetString("UserLoggedIn");
+            if (userLoggedInId != id.ToString() && userLoggedInId != "Admin")
+            {
+                return Forbid();
+            }
             var deliveryMan = await _context.DeliveryMan
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (deliveryMan == null)

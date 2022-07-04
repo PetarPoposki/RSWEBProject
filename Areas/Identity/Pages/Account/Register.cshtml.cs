@@ -126,59 +126,69 @@ namespace RSWEBProject.Areas.Identity.Pages.Account
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
-                var user = CreateUser();
-                
-                await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
-                await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
-                var result = await _userManager.CreateAsync(user, Input.Password);
-                
-                if (result.Succeeded)
+                if (Input.role == "Client" || Input.role == "Delivery Man")
                 {
-                    if (Input.role == "Client")
-                    { result = await _userManager.AddToRoleAsync(user, "Client"); }
-                    if (Input.role == "Delivery Man")
-                    { result = await _userManager.AddToRoleAsync(user, "Delivery Man"); }
-                    _logger.LogInformation("User created a new account with password.");
+                    var user = CreateUser();
 
-                    var userId = await _userManager.GetUserIdAsync(user);
-                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                    if (Input.role == "Client")
-                    {
-                        _context.Client.AddRange(
-                            new Client { FirstName = Input.firstName, LastName = Input.lastName, RSWEBProjectUserId = _context.Users.Single(x => x.Email == Input.Email).Id }
-                        );
-                        _context.SaveChanges();
-                    }
-                    if (Input.role == "Delivery Man")
-                    {
-                        _context.DeliveryMan.AddRange(
-                            new DeliveryMan { FirstName = Input.firstName, LastName = Input.lastName, RSWEBProjectUserId = _context.Users.Single(x => x.Email == Input.Email).Id }
-                        );
-                        _context.SaveChanges();
-                    }
-                    code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-                    var callbackUrl = Url.Page(
-                        "/Account/ConfirmEmail",
-                        pageHandler: null,
-                        values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
-                        protocol: Request.Scheme);
+                    await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
+                    await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
+                    var result = await _userManager.CreateAsync(user, Input.Password);
 
-                    await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                    if (result.Succeeded)
+                    {
+                        if (Input.role == "Client")
+                        { result = await _userManager.AddToRoleAsync(user, "Client"); }
+                        if (Input.role == "Delivery Man")
+                        { result = await _userManager.AddToRoleAsync(user, "Delivery Man"); }
+                        _logger.LogInformation("User created a new account with password.");
 
-                    if (_userManager.Options.SignIn.RequireConfirmedAccount)
-                    {
-                        return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
+                        var userId = await _userManager.GetUserIdAsync(user);
+                        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                        if (Input.role == "Client")
+                        {
+                            _context.Client.AddRange(
+                                new Client { FirstName = Input.firstName, LastName = Input.lastName, RSWEBProjectUserId = _context.Users.Single(x => x.Email == Input.Email).Id }
+                            );
+                            _context.SaveChanges();
+                        }
+                        if (Input.role == "Delivery Man")
+                        {
+                            _context.DeliveryMan.AddRange(
+                                new DeliveryMan { FirstName = Input.firstName, LastName = Input.lastName, RSWEBProjectUserId = _context.Users.Single(x => x.Email == Input.Email).Id }
+                            );
+                            _context.SaveChanges();
+                        }
+                        code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+                        var callbackUrl = Url.Page(
+                            "/Account/ConfirmEmail",
+                            pageHandler: null,
+                            values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
+                            protocol: Request.Scheme);
+
+                        await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
+                            $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+
+                        if (_userManager.Options.SignIn.RequireConfirmedAccount)
+                        {
+                            return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
+                        }
+                        else
+                        {
+                            await _signInManager.SignInAsync(user, isPersistent: false);
+                            await _signInManager.SignOutAsync();
+                            _logger.LogInformation("User logged out.");
+                            return LocalRedirect(returnUrl);
+                        }
                     }
-                    else
+                    foreach (var error in result.Errors)
                     {
-                        await _signInManager.SignInAsync(user, isPersistent: false);
-                        return LocalRedirect(returnUrl);
+                        ModelState.AddModelError(string.Empty, error.Description);
                     }
                 }
-                foreach (var error in result.Errors)
+                else
                 {
-                    ModelState.AddModelError(string.Empty, error.Description);
+                    _logger.LogInformation("User not registered.");
+                    return LocalRedirect(returnUrl);
                 }
             }
 

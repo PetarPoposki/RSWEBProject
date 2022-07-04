@@ -199,14 +199,24 @@ namespace RSWEBProject.Controllers
         // GET: ViewOrders
         public async Task<IActionResult> ViewOrders(int id)
         {
+            var userLoggedInId = HttpContext.Session.GetString("UserLoggedIn");
+            if (userLoggedInId != id.ToString() && userLoggedInId != "Admin")
+            {
+                return Forbid();
+            }
             var kolokviumContext = _context.Order.Where(x => x.ClientId == id).Include(m => m.Client).Include(a => a.Restaurant);
-            return View(await kolokviumContext.ToListAsync());
+            
+          return View(await kolokviumContext.ToListAsync());
         }
         [Authorize(Roles = "Delivery Man")]
         // GET: ViewRestaurants
         public async Task<IActionResult> ViewRestaurants(int id, string type, string name, string location)
         {
-            
+            var userLoggedInId = HttpContext.Session.GetString("UserLoggedIn");
+            if (userLoggedInId != id.ToString() && userLoggedInId != "Admin")
+            {
+                return Forbid();
+            }
             IQueryable<Restaurant> restaurants = _context.Restaurant.AsQueryable();
             restaurants = restaurants.Where(x => x.DeliveryManId == id).Include(m => m.DeliveryMan);
             IQueryable<string> typeQuery = _context.Restaurant.OrderBy(m => m.Type).Select(m => m.Type).Distinct();

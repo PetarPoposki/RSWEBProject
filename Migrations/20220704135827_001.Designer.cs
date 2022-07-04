@@ -12,8 +12,8 @@ using RSWEBProject.Data;
 namespace RSWEBProject.Migrations
 {
     [DbContext(typeof(RSWEBProjectContext))]
-    [Migration("20220703175721_010")]
-    partial class _010
+    [Migration("20220704135827_001")]
+    partial class _001
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

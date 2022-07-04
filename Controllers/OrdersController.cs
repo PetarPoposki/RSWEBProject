@@ -55,6 +55,7 @@ namespace RSWEBProject.Controllers
         {
             ViewData["ClientId"] = new SelectList(_context.Client, "Id", "Id");
             ViewData["RestaurantId"] = new SelectList(_context.Restaurant, "Id", "Id");
+            
             return View();
         }
         [Authorize(Roles = "Client")]
@@ -73,10 +74,12 @@ namespace RSWEBProject.Controllers
             }
             ViewData["ClientId"] = new SelectList(_context.Client, "Id", "Id", order.ClientId);
             ViewData["RestaurantId"] = new SelectList(_context.Restaurant, "Id", "Id", order.RestaurantId);
-            string pomosen = "/Restaurants/ViewOrders/" + order.ClientId;
+            var userLoggedInId = HttpContext.Session.GetString("UserLoggedIn");
 
-            return LocalRedirect(pomosen);
+            // return LocalRedirect("/Restaurants/ViewOrders/" + userLoggedInId);
 
+            // return LocalRedirect(pomosen);
+            return View("/Restaurants/ViewOrders/" + userLoggedInId);
             //return View(order);
         }
         [Authorize(Roles = "Client")]
@@ -95,6 +98,7 @@ namespace RSWEBProject.Controllers
             }
             ViewData["ClientId"] = new SelectList(_context.Client, "Id", "Id", order.ClientId);
             ViewData["RestaurantId"] = new SelectList(_context.Restaurant, "Id", "Id", order.RestaurantId);
+            
             return View(order);
         }
         [Authorize(Roles = "Client")]
@@ -128,10 +132,14 @@ namespace RSWEBProject.Controllers
                         throw;
                     }
                 }
+                
+               
                 return RedirectToAction(nameof(Index));
             }
             ViewData["ClientId"] = new SelectList(_context.Client, "Id", "Id", order.ClientId);
             ViewData["RestaurantId"] = new SelectList(_context.Restaurant, "Id", "Id", order.RestaurantId);
+            
+            
             return View(order);
         }
         [Authorize(Roles = "Admin")]
@@ -192,13 +200,14 @@ namespace RSWEBProject.Controllers
             {
                 return NotFound();
             }
-           // ViewBag.deliveryman = deliveryman;
+            
+            // ViewBag.deliveryman = deliveryman;
             ViewData["ClientId"] = new SelectList(_context.Client, "Id", "Id", order.ClientId);
             ViewData["RestaurantId"] = new SelectList(_context.Restaurant, "Id", "Id", order.RestaurantId);
             return View(order);
         }
         [Authorize(Roles = "Delivery Man")]
-        // POST: Enrollments/EditAsDeliveryMan/5
+        // POST: Orders/EditAsDeliveryMan/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
@@ -210,7 +219,7 @@ namespace RSWEBProject.Controllers
                 return NotFound();
             }
             
-            
+
             if (ModelState.IsValid)
             {
                 try
@@ -243,19 +252,23 @@ namespace RSWEBProject.Controllers
             {
                 return NotFound();
             }
-             
+            
             var order = await _context.Order.FindAsync(id);
             if (order == null)
             {
                 return NotFound();
             }
-            
+            var userLoggedInId = HttpContext.Session.GetString("UserLoggedIn");
+            if (userLoggedInId != order.ClientId.ToString() && userLoggedInId != "Admin")
+            {
+                return Forbid();
+            }
             ViewData["ClientId"] = new SelectList(_context.Client, "Id", "Id", order.ClientId);
             ViewData["RestaurantId"] = new SelectList(_context.Restaurant, "Id", "Id", order.RestaurantId);
             return View(order);
         }
         [Authorize(Roles = "Client")]
-        // POST: Enrollments/EditAsClient/5
+        // POST: Orders/EditAsClient/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
@@ -266,7 +279,12 @@ namespace RSWEBProject.Controllers
             {
                 return NotFound();
             }
-            
+
+            var userLoggedInId = HttpContext.Session.GetString("UserLoggedIn");
+            if (userLoggedInId != order.ClientId.ToString() && userLoggedInId != "Admin")
+            {
+                return Forbid();
+            }
 
             if (ModelState.IsValid)
             {
@@ -286,7 +304,8 @@ namespace RSWEBProject.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction("Index");
+                return LocalRedirect("/Restaurants/ViewRestaurants/" + order.ClientId);
+               // return RedirectToAction("Index");
             }
             ViewData["ClientId"] = new SelectList(_context.Client, "Id", "Id", order.ClientId);
             ViewData["RestaurantId"] = new SelectList(_context.Restaurant, "Id", "Id", order.RestaurantId);

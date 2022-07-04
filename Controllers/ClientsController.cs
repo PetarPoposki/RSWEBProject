@@ -74,7 +74,11 @@ namespace RSWEBProject.Controllers
             {
                 return NotFound();
             }
-
+            var userLoggedInId = HttpContext.Session.GetString("UserLoggedIn");
+            if (userLoggedInId != id.ToString() && userLoggedInId != "Admin")
+            {
+                return Forbid();
+            }
             var client = await _context.Client
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (client == null)
