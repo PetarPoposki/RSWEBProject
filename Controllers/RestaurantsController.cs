@@ -200,11 +200,11 @@ namespace RSWEBProject.Controllers
         public async Task<IActionResult> ViewOrders(int id)
         {
             var userLoggedInId = HttpContext.Session.GetString("UserLoggedIn");
-            if (userLoggedInId != id.ToString() && userLoggedInId != "Admin")
-            {
-                return Forbid();
-            }
-            var kolokviumContext = _context.Order.Where(x => x.ClientId == id).Include(m => m.Client).Include(a => a.Restaurant);
+           // if (userLoggedInId != id.ToString() && userLoggedInId != "Admin")
+           // {
+             //   return Forbid();
+            //}
+            var kolokviumContext = _context.Order.Where(x => x.ClientId == int.Parse(HttpContext.Session.GetString("UserLoggedIn"))).Include(m => m.Client).Include(a => a.Restaurant);
             
           return View(await kolokviumContext.ToListAsync());
         }

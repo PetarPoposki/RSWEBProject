@@ -53,8 +53,8 @@ namespace RSWEBProject.Controllers
         // GET: Orders/Create
         public IActionResult Create()
         {
-            ViewData["ClientId"] = new SelectList(_context.Client, "Id", "Id");
-            ViewData["RestaurantId"] = new SelectList(_context.Restaurant, "Id", "Id");
+            ViewData["ClientId"] = new SelectList(_context.Client.Where(x => x.Id == int.Parse(HttpContext.Session.GetString("UserLoggedIn"))), "Id", "FullName");
+            ViewData["RestaurantId"] = new SelectList(_context.Restaurant, "Id", "Name");
             
             return View();
         }
@@ -70,7 +70,8 @@ namespace RSWEBProject.Controllers
             {
                 _context.Add(order);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                //return RedirectToAction(nameof(Index));
+                return LocalRedirect("/Restaurants/ViewOrders/" + HttpContext.Session.GetString("UserLoggedIn"));
             }
             ViewData["ClientId"] = new SelectList(_context.Client, "Id", "Id", order.ClientId);
             ViewData["RestaurantId"] = new SelectList(_context.Restaurant, "Id", "Id", order.RestaurantId);
@@ -79,7 +80,7 @@ namespace RSWEBProject.Controllers
             // return LocalRedirect("/Restaurants/ViewOrders/" + userLoggedInId);
 
             // return LocalRedirect(pomosen);
-            return View("/Restaurants/ViewOrders/" + userLoggedInId);
+            return LocalRedirect("/Restaurants/ViewOrders/" + HttpContext.Session.GetString("UserLoggedIn"));
             //return View(order);
         }
         [Authorize(Roles = "Client")]
@@ -263,8 +264,8 @@ namespace RSWEBProject.Controllers
             {
                 return Forbid();
             }
-            ViewData["ClientId"] = new SelectList(_context.Client, "Id", "Id", order.ClientId);
-            ViewData["RestaurantId"] = new SelectList(_context.Restaurant, "Id", "Id", order.RestaurantId);
+            ViewData["ClientId"] = new SelectList(_context.Client, "Id", "FullName", order.ClientId);
+            ViewData["RestaurantId"] = new SelectList(_context.Restaurant, "Id", "Name", order.RestaurantId);
             return View(order);
         }
         [Authorize(Roles = "Client")]
@@ -304,7 +305,7 @@ namespace RSWEBProject.Controllers
                         throw;
                     }
                 }
-                return LocalRedirect("/Restaurants/ViewRestaurants/" + order.ClientId);
+                return LocalRedirect("/Restaurants/ViewOrders/" + order.ClientId);
                // return RedirectToAction("Index");
             }
             ViewData["ClientId"] = new SelectList(_context.Client, "Id", "Id", order.ClientId);
